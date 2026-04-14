@@ -466,7 +466,7 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   // Diagonal texture
   ctx.strokeStyle = 'rgba(255,255,255,0.07)';
   ctx.lineWidth = 10 * DPR;
-  for (let x = -cw; x < cw * 2; x += 22 * DPR) {
+  for (let x = -ch * 2; x < cw * 2 + ch; x += 22 * DPR) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + ch, ch); ctx.stroke();
   }
 
@@ -477,6 +477,19 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
     ctx.arc(Math.random()*cw, Math.random()*ch, (1.5+Math.random()*2)*DPR, 0, Math.PI*2);
     ctx.fill();
   }
+
+  // SMF logo watermark (drawn after dots so it's clean)
+  const logo = new Image();
+  logo.src = 'SMF-negativ-senca.png';
+  logo.onload = () => {
+    const maxW = cw * 0.55;
+    const scale = maxW / logo.width;
+    const lw = logo.width * scale;
+    const lh = logo.height * scale;
+    ctx.globalAlpha = 0.18;
+    ctx.drawImage(logo, (cw - lw) / 2, (ch - lh) / 2, lw, lh);
+    ctx.globalAlpha = 1;
+  };
 
   ctx.globalCompositeOperation = 'destination-out';
 
@@ -518,7 +531,7 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   canvas.addEventListener('mousemove', (e) => { if (painting) scratchAt(getPos(e)); });
   window.addEventListener('mouseup',   () => { painting = false; lastPos = null; });
 
-  function onTouchMove(e) { e.preventDefault(); if (painting) scratchAt(getPos(e)); }
+  function onTouchMove(e) { if (painting) scratchAt(getPos(e)); }
   canvas.addEventListener('touchstart', (e) => { painting = true; lastPos = null; scratchAt(getPos(e)); }, { passive: true });
   canvas.addEventListener('touchmove',  onTouchMove, { passive: false });
   canvas.addEventListener('touchend',   () => { painting = false; lastPos = null; });
