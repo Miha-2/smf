@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Spomin | Sport Media Focus Fan Cona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #005F7E;
+    --teal-dark: #004d67;
+    --navy: #013150;
+    --yellow: #FFCD57;
+    --yellow-dark: #e6b83e;
+    --body-text: #67768e;
+    --light-bg: #eef2f5;
+    --board-bg: #dde4ea;
+    --white: #ffffff;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .phone-frame {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--teal);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 26%; height: 100%;
+    background: rgba(255,255,255,0.07);
+    transform: skewX(-12deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+  .logo-img { height: 36px; width: auto; position: relative; z-index: 1; }
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.6);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative; z-index: 1;
+  }
+  .live-dot span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--yellow);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Hero bar ── */
+  .hero-bar {
+    background: var(--navy);
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bar::before {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 26%; height: 100%;
+    background: rgba(0,95,126,0.6);
+    transform: skewX(-12deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+  .hero-bar::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 42%; height: 100%;
+    background: rgba(0,95,126,0.28);
+    transform: skewX(-12deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+
+  /* ── Hint text ── */
+  .hint-text {
+    text-align: center;
+    color: var(--body-text);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 14px;
+    min-height: 16px;
+  }
+  .game-title {
+    color: var(--white);
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 3px;
+    letter-spacing: -0.5px;
+  }
+  .game-sub { color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 500; margin-bottom: 18px; letter-spacing: 0.3px; }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative; z-index: 1;
+  }
+  .stat { flex: 1; text-align: center; padding: 10px 6px; }
+  .stat-val { color: var(--yellow); font-size: 22px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat-lbl { color: rgba(255,255,255,0.35); font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-top: 3px; }
+  .stat-divider { width: 1px; background: rgba(255,255,255,0.08); }
+
+
+  /* Progress */
+  .progress-wrap { margin-top: 14px; position: relative; z-index: 1; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    color: rgba(255,255,255,0.3);
+    font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--yellow);
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 20px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 3px;
+  }
+
+  /* ── Board ── */
+  .board-area {
+    padding: 16px;
+    background: var(--board-bg);
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+  .board-area::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -80px;
+    width: 260px; height: 340px;
+    background: rgba(0,95,126,0.13);
+    transform: rotate(-18deg);
+    pointer-events: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    aspect-ratio: 1;
+    cursor: pointer;
+    perspective: 700px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card:not(.matched):not(.flipped):hover .card-inner {
+    transform: translateY(-2px) scale(1.03);
+  }
+
+  .card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(1,49,80,0.18), 0 1px 2px rgba(1,49,80,0.12);
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-front, .card-back {
+    position: absolute; inset: 0;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Card back — decorative pattern */
+  .card-front {
+    background: var(--teal);
+    transform: rotateY(0deg);
+  }
+  .card-front .pattern {
+    position: absolute; inset: 0;
+    opacity: 0.12;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.8) 0, rgba(255,255,255,0.8) 1px, transparent 0, transparent 22px);
+  }
+  .card-front .smf-mark {
+    position: relative; z-index: 1;
+    width: 42%;
+    opacity: 0.45;
+  }
+
+  /* Card face */
+  .card-back { transform: rotateY(180deg); }
+  .card-icon { width: 72%; height: 72%; object-fit: contain; position: relative; z-index: 1; }
+
+  .face-a { background: #ffffff; }
+  .face-b { background: var(--navy); }
+  .face-c { background: #cce4ed; }
+  .face-d { background: #fff4cc; }
+  .face-e { background: #1e293b; }
+  .face-f { background: #2a5d7a; }
+  .face-g { background: #024166; }
+  .face-h { background: #d6e8f0; }
+
+  .card-back::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.06);
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 80%);
+  }
+
+  /* Matched state — disappear */
+  .card.matched-pending .card-inner {
+    box-shadow: 0 0 0 3px var(--yellow), 0 3px 8px rgba(1,49,80,0.15);
+  }
+  .card.matched-pending { pointer-events: none; }
+
+  @keyframes cardDisappear {
+    0%   { transform: rotateY(180deg) scale(1); opacity: 1; }
+    25%  { transform: rotateY(180deg) scale(1.08); opacity: 1; }
+    100% { transform: rotateY(180deg) scale(0); opacity: 0; }
+  }
+  .card.matched .card-inner {
+    animation: cardDisappear 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  .card.matched { pointer-events: none; }
+
+
+
+  /* ── Actions ── */
+  .actions {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px 24px;
+    background: var(--light-bg);
+  }
+  .btn {
+    flex: 1;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    border: none;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary {
+    background: var(--teal);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(0,95,126,0.35);
+  }
+  .btn-primary:hover { background: var(--teal-dark); }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--teal);
+    border: 1.5px solid var(--teal);
+  }
+
+  /* ── Win overlay ── */
+  .win-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(1,49,80,0.94);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+  }
+  .win-overlay.show { display: flex; }
+  .win-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px 28px 28px;
+    text-align: center;
+    width: 100%;
+    max-width: 320px;
+    animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .win-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--yellow);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.65) translateY(20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0);       opacity: 1; }
+  }
+  .win-icon { font-size: 56px; margin-bottom: 8px; display: block; }
+  .win-label { color: var(--teal); font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .win-label::after { content: ''; display: block; width: 28px; height: 2px; background: var(--teal); margin: 5px auto 0; }
+  .win-title { color: var(--navy); font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+  .win-sub { color: var(--body-text); font-size: 12px; font-weight: 500; margin-bottom: 24px; }
+  .win-stats {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 26px;
+  }
+  .win-stat {
+    flex: 1;
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 12px 8px;
+  }
+  .win-stat-val { color: var(--teal); font-size: 24px; font-weight: 900; }
+  .win-stat-lbl { color: var(--body-text); font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+  .win-btns { display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="header">
+    <img src="SMF-negativ-senca.png" alt="Sport Media Focus" class="logo-img">
+
+  </div>
+
+  <div class="hero-bar">
+    <div class="game-title">Spomin</div>
+    <div class="game-sub">Poišči vse pare in zmagai</div>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-val" id="moves-count">0</div>
+        <div class="stat-lbl">Poteze</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-val" id="timer">00:00</div>
+        <div class="stat-lbl">Čas</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Napredek</span>
+        <span id="progress-text">0 / 8</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="board-area">
+    <div class="grid" id="grid"></div>
+    <p class="hint-text" id="msg-text">Dotakni se katere koli kartice!</p>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="restartGame()">Znova</button>
+    <button class="btn btn-primary" onclick="shareScore()">Deli rezultat</button>
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div class="win-overlay" id="win-overlay">
+  <div class="win-card">
+    <div class="win-icon">🏆</div>
+    <div class="win-label">Zmagal si</div>
+    <div class="win-title">Odlično!</div>
+    <div class="win-sub">Vsi pari najdeni. Super spomin!</div>
+    <div class="win-stats">
+      <div class="win-stat">
+        <div class="win-stat-val" id="win-moves">-</div>
+        <div class="win-stat-lbl">Poteze</div>
+      </div>
+      <div class="win-stat">
+        <div class="win-stat-val" id="win-time">-</div>
+        <div class="win-stat-lbl">Čas</div>
+      </div>
+    </div>
+    <div class="win-btns">
+      <button class="btn btn-secondary" style="flex:1" onclick="restartGame()">Igraj znova</button>
+      <button class="btn btn-primary" style="flex:1" onclick="shareScore()">Deli</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PAIRS = [
+    { id: 'a', img: 'unicredit.png',          faceClass: 'face-a' },
+    { id: 'b', img: 'triglav.svg',            faceClass: 'face-b' },
+    { id: 'c', img: 'NK_Bravo_logo.svg',      faceClass: 'face-c' },
+    { id: 'd', img: 'ach-volley-logo.png',    faceClass: 'face-d' },
+    { id: 'e', img: 'kko.svg',                faceClass: 'face-e' },
+    { id: 'f', img: 'logo-etape-light.png',   faceClass: 'face-f' },
+    { id: 'g', img: 'SMF-negativ-senca.png',  faceClass: 'face-g' },
+    { id: 'h', img: 'hko.png',                faceClass: 'face-h' },
+  ];
+
+  const MESSAGES = {
+    start: 'Dotakni se katere koli kartice!',
+    first: 'Dobro, poišči njen par!',
+    match: 'Par najden! Nadaljuj!',
+    nomatch: 'Ni par. Poskusi znova!',
+    almost: 'Skoraj, ostane še en par!',
+  };
+
+  let cards = [], flipped = [], matched = 0, moves = 0, timerInterval = null, seconds = 0, locked = false;
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function buildGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    cards = shuffle([...PAIRS, ...PAIRS].map((p, i) => ({ ...p, uid: i })));
+
+    cards.forEach((card, idx) => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.dataset.id = card.id;
+      el.dataset.uid = card.uid;
+      el.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="pattern"></div>
+            <img src="SMF-negativ-senca.png" alt="SMF" class="smf-mark">
+          </div>
+          <div class="card-back ${card.faceClass}"><img src="${card.img}" alt="" class="card-icon"></div>
+        </div>`;
+      el.addEventListener('click', () => onCardClick(el));
+      grid.appendChild(el);
+    });
+  }
+
+  function onCardClick(el) {
+    if (locked) return;
+    if (el.classList.contains('flipped') || el.classList.contains('matched')) return;
+    if (!timerInterval) startTimer();
+
+    el.classList.add('flipped');
+    flipped.push(el);
+
+    if (flipped.length === 1) {
+      setMsg(MESSAGES.first);
+      return;
+    }
+
+    moves++;
+    document.getElementById('moves-count').textContent = moves;
+    locked = true;
+
+    const [a, b] = flipped;
+    if (a.dataset.id === b.dataset.id) {
+      a.classList.add('matched-pending');
+      b.classList.add('matched-pending');
+      matched++;
+      document.getElementById('progress').style.width = (matched / PAIRS.length * 100) + '%';
+      document.getElementById('progress-text').textContent = matched + ' / ' + PAIRS.length;
+      flipped = [];
+      locked = false;
+      const remaining = PAIRS.length - matched;
+      if (remaining === 1) { setMsg(MESSAGES.almost); }
+      else if (remaining > 0) { setMsg(MESSAGES.match); }
+      setTimeout(() => {
+        a.classList.remove('matched-pending');
+        b.classList.remove('matched-pending');
+        a.classList.add('matched');
+        b.classList.add('matched');
+        if (remaining === 0) { setTimeout(showWin, 500); }
+      }, 800);
+    } else {
+      setMsg(MESSAGES.nomatch);
+      setTimeout(() => {
+        a.classList.remove('flipped');
+        b.classList.remove('flipped');
+        flipped = [];
+        locked = false;
+        setMsg('Naprej, zmoreš!');
+      }, 900);
+    }
+  }
+
+  function startTimer() {
+    seconds = 0;
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = m + ':' + s;
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function setMsg(text) {
+    document.getElementById('msg-text').textContent = text;
+  }
+
+  function showWin() {
+    stopTimer();
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    document.getElementById('win-moves').textContent = moves;
+    document.getElementById('win-time').textContent = m + ':' + s;
+    document.getElementById('win-overlay').classList.add('show');
+  }
+
+  function restartGame() {
+    stopTimer();
+    matched = 0; moves = 0; flipped = []; locked = false; seconds = 0;
+    document.getElementById('moves-count').textContent = '0';
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('progress').style.width = '0%';
+    document.getElementById('progress-text').textContent = '0 / ' + PAIRS.length;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('matched', 'matched-pending', 'flipped'));
+    document.getElementById('win-overlay').classList.remove('show');
+    setMsg(MESSAGES.start);
+    buildGrid();
+  }
+
+  function shareScore() {
+    const text = `Našel sem vse pare v ${moves} potezah na Sport Media Focus Fan Coni! 🏆`;
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setMsg('Rezultat kopiran v odložišče!');
+    }
+  }
+
+  buildGrid();
+</script>
+</body>
+</html>
