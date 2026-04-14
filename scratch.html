@@ -208,15 +208,6 @@
   .reveal-all-btn:hover    { background: var(--teal-dark); }
   .reveal-all-btn:disabled { opacity: 0.2; cursor: default; background: var(--body-text); }
 
-  /* ── Bottom actions ── */
-  .actions {
-    background: var(--white);
-    padding: 10px 14px 14px;
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-    border-top: 1px solid rgba(0,95,126,0.08);
-  }
   .btn {
     flex: 1;
     padding: 13px 10px;
@@ -306,10 +297,6 @@
     <!-- cards injected by JS -->
   </div>
 
-  <div class="actions">
-    <button class="btn btn-secondary" onclick="newGame()">Nov listek</button>
-    <button class="btn btn-primary"   onclick="shareResult()">Deli</button>
-  </div>
 </div>
 
 <!-- Prize overlay -->
@@ -633,18 +620,18 @@ function revealAll(cardIdx) {
   document.getElementById(`reveal-btn-${cardIdx}`).disabled = true;
   for (let i = 0; i < 9; i++) {
     setTimeout(() => {
-      if (state.revealed.has(i)) return;
       const cell   = document.getElementById(`cell-${cardIdx}-${i}`);
       const canvas = cell.querySelector('canvas');
-      // Force-clear the canvas regardless of scratch state
+      // Force-clear and hide the canvas regardless of scratch state
       const ctx = canvas.getContext('2d');
       ctx.globalCompositeOperation = 'source-over';
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
       canvas.parentElement.style.pointerEvents = 'none';
       if (!state.revealed.has(i)) {
         state.revealed.add(i);
-        cell.classList.add('revealed');
       }
+      cell.classList.add('revealed', 'scratch-done');
       checkWin(cardIdx, state);
     }, i * 80);
   }
