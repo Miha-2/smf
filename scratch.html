@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Praskaj in zmagai | Sport Media Focus Fan Cona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #005F7E; --teal-dark: #004d67; --navy: #013150;
+    --yellow: #FFCD57; --yellow-dark: #e6b83e;
+    --body-text: #67768e; --light-bg: #eef2f5; --board-bg: #dde4ea; --white: #ffffff;
+  }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--navy);
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-frame {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* ── Hero bar ── */
+  .hero-bar {
+    background: var(--navy);
+    padding: 16px 20px 14px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hero-bar::before {
+    content: '';
+    position: absolute; right: 0; top: 0;
+    width: 26%; height: 100%;
+    background: rgba(0,95,126,0.6);
+    transform: skewX(-12deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+  .hero-bar::after {
+    content: '';
+    position: absolute; right: 0; top: 0;
+    width: 42%; height: 100%;
+    background: rgba(0,95,126,0.28);
+    transform: skewX(-12deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+  .logo-img { height: 44px; width: auto; position: relative; z-index: 1; }
+  .game-title { color: var(--white); font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 3px; letter-spacing: -0.5px; position: relative; z-index: 1; }
+  .game-sub   { color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 500; letter-spacing: 0.3px; position: relative; z-index: 1; }
+
+  /* ── Board area ── */
+  .board-area {
+    background: var(--board-bg);
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Scratch card — fills board flush ── */
+  .scratch-card {
+    background: var(--board-bg);
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* Grid fills all space — rows AND cols */
+  .scratch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px 10px 6px;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+
+  .scratch-cell {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: crosshair;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    min-height: 0;
+  }
+
+  .cell-prize {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 12px;
+    background: var(--white);
+    border: 2px solid #cfdce5;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .cell-prize-emoji { font-size: clamp(18px, 5vw, 28px); line-height: 1; }
+  .cell-prize-name  { color: var(--body-text); font-size: clamp(6px, 1.6vw, 8px); font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; text-align: center; padding: 0 4px; line-height: 1.2; }
+
+  .cell-scratch-layer {
+    position: absolute; inset: 0;
+    border-radius: 12px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .cell-scratch-layer canvas {
+    display: block; width: 100%; height: 100%; border-radius: 12px;
+  }
+
+  /* Revealed: neutral */
+  .scratch-cell.revealed .cell-prize {
+    border-color: #b8cdd8;
+    background: #f4f8fa;
+  }
+
+  /* Win cell: golden glow — visible before user knows full combo */
+  .scratch-cell.win-cell .cell-prize {
+    border-color: var(--yellow-dark);
+    background: #fffbee;
+    box-shadow: 0 0 0 2px var(--yellow) inset, 0 3px 12px rgba(255,205,87,0.4);
+    animation: winPulse 1.4s ease-in-out infinite;
+  }
+  .scratch-cell.win-cell .cell-prize-emoji { filter: drop-shadow(0 0 5px rgba(255,180,0,0.7)); }
+  .scratch-cell.win-cell .cell-prize-name  { color: var(--navy); font-weight: 900; }
+  @keyframes winPulse {
+    0%, 100% { box-shadow: 0 0 0 2px var(--yellow) inset, 0 2px 10px rgba(255,205,87,0.3); }
+    50%       { box-shadow: 0 0 0 3px var(--yellow) inset, 0 4px 20px rgba(255,205,87,0.65); }
+  }
+
+  /* All 3 confirmed win */
+  .scratch-cell.win-confirmed .cell-prize {
+    background: #fff6d0;
+    border-color: var(--yellow);
+    animation: none;
+    box-shadow: 0 0 0 3px var(--yellow) inset, 0 4px 18px rgba(255,205,87,0.55);
+  }
+
+  /* ── Card footer: status line + reveal-all ── */
+  .card-footer {
+    padding: 8px 12px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 10px;
+    background: var(--white);
+    border-top: 1px solid rgba(0,95,126,0.07);
+  }
+  .card-status {
+    color: var(--body-text);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex: 1;
+    transition: color 0.3s;
+  }
+  .card-status::before {
+    content: '';
+  }
+  .card-status.status-win::before  { content: ''; }
+  .card-status.status-lose::before { content: ''; }
+  .card-status.status-win  { color: var(--teal); font-weight: 900; }
+  .card-status.status-lose { color: var(--body-text); opacity: 0.6; }
+
+  .reveal-all-btn {
+    background: var(--teal);
+    border: none;
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .reveal-all-btn:hover    { background: var(--teal-dark); }
+  .reveal-all-btn:disabled { opacity: 0.2; cursor: default; background: var(--body-text); }
+
+  /* ── Bottom actions ── */
+  .actions {
+    background: var(--white);
+    padding: 10px 14px 14px;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(0,95,126,0.08);
+  }
+  .btn {
+    flex: 1;
+    padding: 13px 10px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary   { background: var(--teal); color: var(--white); }
+  .btn-primary:hover { background: var(--teal-dark); }
+  .btn-secondary { background: var(--light-bg); color: var(--navy); }
+  .btn-secondary:hover { background: #dde4ea; }
+
+  /* ── Prize overlay ── */
+  .prize-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(1,49,80,0.72);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+  }
+  .prize-overlay.show { display: flex; }
+  .prize-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 36px 28px 28px;
+    text-align: center;
+    width: 100%; max-width: 320px;
+    animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .prize-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--yellow);
+  }
+  .prize-card.no-prize::before { background: var(--body-text); }
+  @keyframes popIn { from{transform:scale(0.65) translateY(20px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+  .prize-icon { font-size: 56px; margin-bottom: 10px; display: block; }
+  .prize-label { color: var(--teal); font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; }
+  .prize-label::after { content:''; display:block; width:28px; height:2px; background:var(--teal); margin:5px auto 8px; }
+  .prize-name  { color: var(--navy); font-size: 24px; font-weight: 900; margin-bottom: 4px; line-height: 1.15; }
+  .prize-desc  { color: var(--body-text); font-size: 12px; font-weight: 500; margin-bottom: 22px; line-height: 1.6; }
+  .prize-code-wrap {
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1.5px dashed rgba(0,95,126,0.3);
+  }
+  .prize-code-lbl { color: var(--body-text); font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px; }
+  .prize-code     { color: var(--teal); font-size: 22px; font-weight: 900; letter-spacing: 3px; }
+  .prize-btns { display: flex; gap: 10px; }
+  .prize-btns .btn { flex: 1; }
+
+  /* ── Confetti ── */
+  .confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 99; overflow: hidden; }
+  .confetti-piece { position: absolute; top: -10px; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+  @keyframes tickPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+  .scratch-done { box-shadow: 0 0 0 3px #4aa8c0; transition: box-shadow 0.2s ease; }
+  .scratch-cell.revealed .cell-prize { animation: cellPop 0.3s cubic-bezier(0.34,1.4,0.64,1); }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+
+  <div class="hero-bar">
+    <div>
+      <div class="game-title">Praskaj!</div>
+      <div class="game-sub">3 enake v vrsti, stolpcu ali diagonali</div>
+    </div>
+    <img src="SMF-negativ-senca.png" alt="Sport Media Focus" class="logo-img">
+  </div>
+
+  <div class="board-area" id="board-area">
+    <!-- cards injected by JS -->
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="newGame()">Nov listek</button>
+    <button class="btn btn-primary"   onclick="shareResult()">Deli</button>
+  </div>
+</div>
+
+<!-- Prize overlay -->
+<div class="prize-overlay" id="prize-overlay">
+  <div class="prize-card" id="prize-card">
+    <span class="prize-icon" id="prize-icon">🎉</span>
+    <div class="prize-label" id="prize-label">Nagrada</div>
+    <div class="prize-name"  id="prize-name">-</div>
+    <div class="prize-desc"  id="prize-desc">-</div>
+    <div class="prize-code-wrap" id="prize-code-wrap">
+      <div class="prize-code-lbl">Tvoja koda</div>
+      <div class="prize-code" id="prize-code">-</div>
+    </div>
+    <div class="prize-btns">
+      <button class="btn btn-secondary" onclick="closePrize()">Zapri</button>
+      <button class="btn btn-primary"   onclick="sharePrize()">Deli</button>
+    </div>
+  </div>
+</div>
+
+<div class="confetti-wrap" id="confetti-wrap"></div>
+
+<script>
+// ── Prize definitions ─────────────────────────────────────────────────────────
+const PRIZES = [
+  { id: 'jersey',  emoji: '👕', name: 'SMF dres',       desc: 'Uradni Sport Media Focus dres. Prevzemi na info pultu.',      code: 'SMF-DRES',   weight: 1 },
+  { id: 'cap',     emoji: '🧢', name: 'SMF kapa',        desc: 'Uradna Sport Media Focus kapa. Prevzemi na info pultu.',      code: 'SMF-KAPA',   weight: 3 },
+  { id: 'ticket',  emoji: '🎟️', name: 'VIP vstopnica',   desc: 'VIP vstopnica za prihodnji SMF dogodek.',                    code: 'SMF-VIP',    weight: 2 },
+  { id: 'bottle',  emoji: '🍶', name: 'SMF steklenica',  desc: 'Sport Media Focus steklenica za vodo. Prevzemi na pultu.',    code: 'SMF-STEKL',  weight: 4 },
+  { id: 'bag',     emoji: '🎒', name: 'SMF nahrbtnik',   desc: 'Ekskluzivni SMF nahrbtnik. Prevzemi na info pultu.',          code: 'SMF-NAHRB',  weight: 2 },
+  { id: 'sporto',  emoji: '🏆', name: 'SPORTO vstopnica',desc: 'Vstopnica za SPORTO konferenco o športnem marketingu.',       code: 'SPORTO-VX',  weight: 1 },
+  { id: 'nowin',   emoji: '😅', name: 'Ni dobitka',      desc: 'Tokrat ni šlo. Poskusi naslednjič!',                         code: null,         weight: 8 },
+];
+
+// ── Weighted random pick ──────────────────────────────────────────────────────
+function weightedPick() {
+  const total = PRIZES.reduce((s, p) => s + p.weight, 0);
+  let r = Math.random() * total;
+  for (const p of PRIZES) { r -= p.weight; if (r <= 0) return p; }
+  return PRIZES[PRIZES.length - 1];
+}
+
+// Each card has 9 cells (3×3). A win = 3 identical prizes in a row/col/diagonal.
+// We generate the grid so there's always exactly one outcome: win or no-win.
+function generateGrid() {
+  // Pick the winning prize (including possibly 'nowin')
+  const mainPrize = weightedPick();
+  const grid = [];
+
+  if (mainPrize.id === 'nowin') {
+    // Fill with 9 random non-winning cells (avoid 3-of-a-kind)
+    const pool = PRIZES.filter(p => p.id !== 'nowin');
+    let attempts = 0;
+    while (true) {
+      attempts++;
+      const cells = Array.from({ length: 9 }, () => pool[Math.floor(Math.random() * pool.length)]);
+      if (!hasThreeInARow(cells)) return { cells, winPrize: null };
+      if (attempts > 200) {
+        // fallback: just use 9 different non-win
+        const forced = [];
+        for (let i = 0; i < 9; i++) forced.push(pool[i % pool.length]);
+        return { cells: forced, winPrize: null };
+      }
+    }
+  } else {
+    // Place 3 of winPrize in one of 8 lines, fill rest with noise
+    const lines = [
+      [0,1,2],[3,4,5],[6,7,8], // rows
+      [0,3,6],[1,4,7],[2,5,8], // cols
+      [0,4,8],[2,4,6]          // diags
+    ];
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    const others = PRIZES.filter(p => p.id !== mainPrize.id && p.id !== 'nowin');
+    const cells = Array(9).fill(null);
+    line.forEach(i => { cells[i] = mainPrize; });
+    for (let i = 0; i < 9; i++) {
+      if (!cells[i]) cells[i] = others[Math.floor(Math.random() * others.length)];
+    }
+    return { cells, winPrize: mainPrize };
+  }
+}
+
+function hasThreeInARow(cells) {
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return lines.some(([a,b,c]) => cells[a].id === cells[b].id && cells[b].id === cells[c].id);
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let cards = [];   // [{ cells, winPrize, revealed: Set, finished }]
+let lastWin = null;
+
+// ── Build DOM ─────────────────────────────────────────────────────────────────
+function newGame() {
+  const board = document.getElementById('board-area');
+  board.innerHTML = '';
+  cards = [];
+  lastWin = null;
+  const count = 1; // one scratch card per game
+  for (let c = 0; c < count; c++) {
+    const { cells, winPrize } = generateGrid();
+    const cardState = { cells, winPrize, revealed: new Set(), finished: false, idx: c };
+    cards.push(cardState);
+    board.appendChild(buildCard(cardState, c));
+  }
+  closePrize();
+}
+
+function buildCard(state, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'scratch-card';
+  wrap.id = 'card-' + idx;
+
+  wrap.innerHTML = `
+    <div class="scratch-grid" id="grid-${idx}"></div>
+    <div class="card-footer">
+      <div class="card-status" id="status-${idx}">Praskaj in preveri svojo srečo!</div>
+      <button class="reveal-all-btn" id="reveal-btn-${idx}" onclick="revealAll(${idx})">Razkrij vse</button>
+    </div>`;
+
+  const grid = wrap.querySelector(`#grid-${idx}`);
+  state.cells.forEach((prize, cellIdx) => {
+    const cell = document.createElement('div');
+    cell.className = 'scratch-cell';
+    cell.id = `cell-${idx}-${cellIdx}`;
+
+    // Prize layer (below)
+    const prizeLayer = document.createElement('div');
+    prizeLayer.className = 'cell-prize';
+    prizeLayer.innerHTML = `<div class="cell-prize-emoji">${prize.emoji}</div><div class="cell-prize-name">${prize.name}</div>`;
+    cell.appendChild(prizeLayer);
+
+    // Scratch canvas layer (above)
+    const scratchWrap = document.createElement('div');
+    scratchWrap.className = 'cell-scratch-layer';
+    const canvas = document.createElement('canvas');
+    scratchWrap.appendChild(canvas);
+    cell.appendChild(scratchWrap);
+
+    grid.appendChild(cell);
+
+    // Init canvas after layout
+    requestAnimationFrame(() => initScratch(cell, canvas, idx, cellIdx, state));
+  });
+
+  return wrap;
+}
+
+// ── Scratch canvas logic ──────────────────────────────────────────────────────
+function initScratch(cell, canvas, cardIdx, cellIdx, state) {
+  const w = cell.offsetWidth  || 80;
+  const h = cell.offsetHeight || 80;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width  = w * DPR;
+  canvas.height = h * DPR;
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+
+  const ctx = canvas.getContext('2d');
+  const cw = canvas.width;
+  const ch = canvas.height;
+
+  // Draw scratch surface
+  const grad = ctx.createLinearGradient(0, 0, cw, ch);
+  grad.addColorStop(0, '#005F7E');
+  grad.addColorStop(1, '#003d52');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Diagonal texture
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth = 10 * DPR;
+  for (let x = -cw; x < cw * 2; x += 22 * DPR) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + ch, ch); ctx.stroke();
+  }
+
+  // Noise dots
+  ctx.fillStyle = 'rgba(0,0,0,0.07)';
+  for (let i = 0; i < 60; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random()*cw, Math.random()*ch, (1.5+Math.random()*2)*DPR, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = 'destination-out';
+
+  let painting = false;
+  let lastPos = null;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = cw / rect.width;
+    const scaleY = ch / rect.height;
+    if (e.touches) {
+      return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
+    }
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  }
+
+  function scratchAt(pos) {
+    // Small hard brush — requires real effort to clear
+    const r = Math.min(cw, ch) * 0.13;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Connect last point for smooth strokes
+    if (lastPos) {
+      ctx.lineWidth = r * 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(lastPos.x, lastPos.y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+    lastPos = pos;
+
+    checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell);
+  }
+
+  canvas.addEventListener('mousedown', (e) => { painting = true; lastPos = null; scratchAt(getPos(e)); });
+  canvas.addEventListener('mousemove', (e) => { if (painting) scratchAt(getPos(e)); });
+  window.addEventListener('mouseup',   () => { painting = false; lastPos = null; });
+
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); painting = true; lastPos = null; scratchAt(getPos(e)); }, { passive: false });
+  canvas.addEventListener('touchmove',  (e) => { e.preventDefault(); if (painting) scratchAt(getPos(e)); }, { passive: false });
+  canvas.addEventListener('touchend',   () => { painting = false; lastPos = null; });
+}
+
+function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
+  if (state.revealed.has(cellIdx)) return;
+
+  const cw = canvas.width, ch = canvas.height;
+  const imageData = canvas.getContext('2d').getImageData(0, 0, cw, ch);
+  const data = imageData.data;
+
+  // Sample a center-weighted grid instead of every pixel (cheaper + center-biased)
+  const cx = cw / 2, cy = ch / 2;
+  let totalWeight = 0, cleared = 0;
+  const step = 4; // sample every 4px
+  for (let y = 0; y < ch; y += step) {
+    for (let x = 0; x < cw; x += step) {
+      const dx = (x - cx) / cx, dy = (y - cy) / cy;
+      const dist = Math.sqrt(dx*dx + dy*dy); // 0 = center, ~1.4 = corner
+      const weight = Math.max(0.05, 1 - dist * 0.85); // center ~1.0, edges ~0.05
+      const idx = (y * cw + x) * 4 + 3;
+      totalWeight += weight;
+      if (data[idx] < 128) cleared += weight;
+    }
+  }
+
+  if (cleared / totalWeight > 0.45) {
+    state.revealed.add(cellIdx);
+    canvas.parentElement.style.pointerEvents = 'none';
+    cell.classList.add('scratch-done');
+    updateProgress(cardIdx, state);
+    checkWin(cardIdx, state);
+  }
+}
+
+function revealCell(canvas, cardIdx, cellIdx, state, cell) {
+  if (state.revealed.has(cellIdx)) return;
+  state.revealed.add(cellIdx);
+
+  // Clear canvas fully
+  canvas.style.display = 'none';
+  canvas.parentElement.style.pointerEvents = 'none';
+
+  cell.classList.add('revealed');
+
+  updateProgress(cardIdx, state);
+  checkWin(cardIdx, state);
+}
+
+function updateProgress(cardIdx, state) {
+  const n = state.revealed.size;
+  if (n === 9) {
+    document.getElementById(`reveal-btn-${cardIdx}`).disabled = true;
+  }
+}
+
+function checkWin(cardIdx, state) {
+  if (state.finished) return;
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const allRevealed = state.revealed.size === 9;
+
+  const winLine = lines.find(([a,b,c]) =>
+    state.revealed.has(a) && state.revealed.has(b) && state.revealed.has(c) &&
+    state.cells[a].id === state.cells[b].id && state.cells[b].id === state.cells[c].id &&
+    state.cells[a].id !== 'nowin'
+  );
+
+  if (winLine) {
+    state.finished = true;
+    const prize = state.cells[winLine[0]];
+    lastWin = prize;
+    // Mark all 3 winning cells as confirmed
+    winLine.forEach(i => {
+      const c = document.getElementById(`cell-${cardIdx}-${i}`);
+      c.classList.add('win-cell', 'win-confirmed');
+    });
+    const statusEl = document.getElementById(`status-${cardIdx}`);
+    statusEl.textContent = `Zmagal si! ${prize.name} je tvoj.`;
+    statusEl.className = 'card-status status-win';
+    document.getElementById(`reveal-btn-${cardIdx}`).disabled = true;
+    launchConfetti();
+    setTimeout(() => showPrize(prize, true), 900);
+    return;
+  }
+
+  if (allRevealed && !state.finished) {
+    state.finished = true;
+    const statusEl = document.getElementById(`status-${cardIdx}`);
+    statusEl.textContent = 'Tokrat ni šlo. Poskusi znova!';
+    statusEl.className = 'card-status status-lose';
+  }
+}
+
+function revealAll(cardIdx) {
+  const state = cards[cardIdx];
+  if (!state) return;
+  document.getElementById(`reveal-btn-${cardIdx}`).disabled = true;
+  for (let i = 0; i < 9; i++) {
+    setTimeout(() => {
+      if (state.revealed.has(i)) return;
+      const cell   = document.getElementById(`cell-${cardIdx}-${i}`);
+      const canvas = cell.querySelector('canvas');
+      // Force-clear the canvas regardless of scratch state
+      const ctx = canvas.getContext('2d');
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.parentElement.style.pointerEvents = 'none';
+      if (!state.revealed.has(i)) {
+        state.revealed.add(i);
+        cell.classList.add('revealed');
+      }
+      checkWin(cardIdx, state);
+    }, i * 80);
+  }
+}
+
+// ── Prize modal ───────────────────────────────────────────────────────────────
+function showPrize(prize, isWin) {
+  document.getElementById('prize-icon').textContent = prize.emoji;
+  document.getElementById('prize-label').textContent = isWin ? 'Nagrada' : 'Brez nagrade';
+  document.getElementById('prize-name').textContent  = prize.name;
+  document.getElementById('prize-desc').textContent  = prize.desc;
+  const codeWrap = document.getElementById('prize-code-wrap');
+  const card = document.getElementById('prize-card');
+  if (prize.code) {
+    codeWrap.style.display = 'block';
+    document.getElementById('prize-code').textContent = prize.code;
+    card.classList.remove('no-prize');
+  } else {
+    codeWrap.style.display = 'none';
+    card.classList.add('no-prize');
+  }
+  document.getElementById('prize-overlay').classList.add('show');
+}
+
+function closePrize() {
+  document.getElementById('prize-overlay').classList.remove('show');
+}
+
+function sharePrize() {
+  const t = lastWin?.code
+    ? `Pravkar sem zadel "${lastWin.name}" na Sport Media Focus Fan Coni! Koda: ${lastWin.code}`
+    : `Igral sem Praskaj igro na Sport Media Focus Fan Coni!`;
+  if (navigator.share) navigator.share({ text: t }).catch(() => {});
+  else navigator.clipboard.writeText(t).catch(() => {});
+  closePrize();
+}
+
+function shareResult() {
+  const won = cards.filter(c => c.winPrize).length;
+  const t = won > 0
+    ? `Zadel sem nagrado na Sport Media Focus Praskaj igri!`
+    : `Igral sem Praskaj igro na Sport Media Focus Fan Coni!`;
+  if (navigator.share) navigator.share({ text: t }).catch(() => {});
+  else navigator.clipboard.writeText(t).catch(() => {});
+}
+
+// ── Confetti ──────────────────────────────────────────────────────────────────
+const CC = ['#005F7E','#FFCD57','#013150','#ffffff','#e6b83e','#cce4ed'];
+function launchConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    const s = 6 + Math.random() * 8;
+    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${CC[i%CC.length]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.5+Math.random()*1.8}s;animation-delay:${Math.random()*.6}s;`;
+    wrap.appendChild(p);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 3500);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+newGame();
+</script>
+</body>
+</html>
