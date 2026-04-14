@@ -520,9 +520,11 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   canvas.addEventListener('mousemove', (e) => { if (painting) scratchAt(getPos(e)); });
   window.addEventListener('mouseup',   () => { painting = false; lastPos = null; });
 
-  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); painting = true; lastPos = null; scratchAt(getPos(e)); }, { passive: false });
-  canvas.addEventListener('touchmove',  (e) => { e.preventDefault(); if (painting) scratchAt(getPos(e)); }, { passive: false });
+  function onTouchMove(e) { e.preventDefault(); if (painting) scratchAt(getPos(e)); }
+  canvas.addEventListener('touchstart', (e) => { painting = true; lastPos = null; scratchAt(getPos(e)); }, { passive: true });
+  canvas.addEventListener('touchmove',  onTouchMove, { passive: false });
   canvas.addEventListener('touchend',   () => { painting = false; lastPos = null; });
+  cell._removeScratchTouch = () => canvas.removeEventListener('touchmove', onTouchMove);
 }
 
 function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
@@ -551,6 +553,7 @@ function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
     state.revealed.add(cellIdx);
     canvas.parentElement.style.pointerEvents = 'none';
     cell.classList.add('scratch-done');
+    if (cell._removeScratchTouch) cell._removeScratchTouch();
     updateProgress(cardIdx, state);
     checkWin(cardIdx, state);
   }
@@ -631,6 +634,7 @@ function revealAll(cardIdx) {
       if (!state.revealed.has(i)) {
         state.revealed.add(i);
       }
+      if (cell._removeScratchTouch) cell._removeScratchTouch();
       cell.classList.add('revealed', 'scratch-done');
       checkWin(cardIdx, state);
     }, i * 80);
