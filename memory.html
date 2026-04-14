@@ -82,6 +82,16 @@
     50% { opacity: 0.3; }
   }
 
+  /* ── Hero logo ── */
+  .hero-logo {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    height: 46px;
+    width: auto;
+    z-index: 2;
+  }
+
   /* ── Hero bar ── */
   .hero-bar {
     background: var(--navy);
@@ -375,14 +385,10 @@
 <body>
 
 <div class="phone-frame">
-  <div class="header">
-    <img src="SMF-negativ-senca.png" alt="Sport Media Focus" class="logo-img">
-
-  </div>
-
   <div class="hero-bar">
+    <img src="SMF-negativ-senca.png" alt="Sport Media Focus" class="hero-logo">
     <div class="game-title">Spomin</div>
-    <div class="game-sub">Poišči vse pare in zmagai</div>
+    <div class="game-sub">Poišči vse pare in zmagaj</div>
     <div class="stats-row">
       <div class="stat">
         <div class="stat-val" id="moves-count">0</div>
