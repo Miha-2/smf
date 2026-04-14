@@ -19,6 +19,7 @@
   .logo-img { height: 44px; width: auto; position: relative; z-index: 1; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+  .hero-diagonal { position: absolute; right: 0; top: 0; width: 26%; height: 100%; background: rgba(255,255,255,0.07); transform: skewX(-12deg); transform-origin: bottom right; pointer-events: none; z-index: 0; }
   .hero-bar { background: var(--navy); padding: 16px 20px 14px; position: relative; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
   .hero-bar::before { content: ''; position: absolute; right: 0; top: 0; width: 26%; height: 100%; background: rgba(0,95,126,0.6); transform: skewX(-12deg); transform-origin: bottom right; pointer-events: none; }
   .hero-bar::after  { content: ''; position: absolute; right: 0; top: 0; width: 42%; height: 100%; background: rgba(0,95,126,0.28); transform: skewX(-12deg); transform-origin: bottom right; pointer-events: none; }
@@ -89,6 +90,7 @@
 <div class="phone-frame">
 
   <div class="hero-bar">
+    <div class="hero-diagonal"></div>
     <div>
       <div class="game-title">Kolo sreče</div>
       <div class="game-sub">Zavrti in osvoji nagrado!</div>
@@ -113,7 +115,7 @@
 
 <div class="prize-overlay" id="prize-overlay">
   <div class="prize-card" id="prize-card">
-    <div class="prize-emoji" id="prize-emoji" style="font-size:64px;margin-bottom:10px;display:block"></div>
+    <span class="prize-emoji" id="prize-emoji"></span>
     <div class="prize-label" id="prize-label">Nagrada</div>
     <div class="prize-name"  id="prize-name">-</div>
     <div class="prize-desc"  id="prize-desc">-</div>
