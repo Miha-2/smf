@@ -126,7 +126,7 @@
     position: absolute; inset: 0;
     border-radius: 12px;
     cursor: crosshair;
-    touch-action: pan-y;
+    touch-action: none;
   }
   .cell-scratch-layer canvas {
     display: block; width: 100%; height: 100%; border-radius: 12px;
@@ -535,7 +535,7 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   canvas.addEventListener('mousemove', (e) => { if (painting) scratchAt(getPos(e)); });
   window.addEventListener('mouseup',   () => { painting = false; lastPos = null; });
 
-  function onTouchMove(e) { if (painting) scratchAt(getPos(e)); }
+  function onTouchMove(e) { e.preventDefault(); if (painting) scratchAt(getPos(e)); }
   canvas.addEventListener('touchstart', (e) => { painting = true; lastPos = null; scratchAt(getPos(e)); }, { passive: true });
   canvas.addEventListener('touchmove',  onTouchMove, { passive: false });
   canvas.addEventListener('touchend',   () => { painting = false; lastPos = null; });
@@ -735,6 +735,12 @@ window.addEventListener('resize', () => {
     });
   }, 150);
 });
+
+// ── Prevent scroll everywhere except the hero bar ────────────────────────────
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('.hero-bar')) return;
+  e.preventDefault();
+}, { passive: false });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 newGame();
