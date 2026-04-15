@@ -563,7 +563,7 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
 }
 
 function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
-  if (state.revealed.has(cellIdx)) return;
+  if (state.scratchDone && state.scratchDone.has(cellIdx)) return;
 
   const cw = canvas.width, ch = canvas.height;
   const imageData = canvas.getContext('2d').getImageData(0, 0, cw, ch);
@@ -595,7 +595,8 @@ function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
 
   // Upper threshold (~65%): fully done — disable further scratching
   if (ratio > 0.65) {
-    state.revealed.add(cellIdx);
+    if (!state.scratchDone) state.scratchDone = new Set();
+    state.scratchDone.add(cellIdx);
     canvas.parentElement.style.pointerEvents = 'none';
     if (cell._removeScratchTouch) cell._removeScratchTouch();
   }
