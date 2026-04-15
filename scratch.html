@@ -713,8 +713,14 @@ function launchConfetti() {
 }
 
 // ── Resize handling ───────────────────────────────────────────────────────────
+// Only reinit on WIDTH changes — mobile address bar show/hide only changes
+// height and would reset scratch progress if we responded to it.
 let resizeTimer = null;
+let lastResizeWidth = window.innerWidth;
 window.addEventListener('resize', () => {
+  const newWidth = window.innerWidth;
+  if (newWidth === lastResizeWidth) return; // height-only change (address bar), ignore
+  lastResizeWidth = newWidth;
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     cards.forEach((state, cardIdx) => {
