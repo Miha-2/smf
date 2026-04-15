@@ -515,12 +515,12 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   ctx.lineJoin = 'round';
 
   const LINES = [
-    { off: -r * 0.80, w: r * 0.28 },
-    { off: -r * 0.42, w: r * 0.18 },
-    { off: -r * 0.10, w: r * 0.38 },
-    { off:  r * 0.22, w: r * 0.20 },
-    { off:  r * 0.52, w: r * 0.30 },
-    { off:  r * 0.78, w: r * 0.14 },
+    { off: -r * 0.80, w: r * 0.45 },
+    { off: -r * 0.42, w: r * 0.30 },
+    { off: -r * 0.10, w: r * 0.60 },
+    { off:  r * 0.22, w: r * 0.32 },
+    { off:  r * 0.52, w: r * 0.48 },
+    { off:  r * 0.78, w: r * 0.24 },
   ];
 
   let revealTick = 0;
@@ -536,7 +536,7 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
     for (const { off, w } of LINES) {
       const o = off + jitter;
       ctx.lineWidth = w;
-      for (let pass = 0; pass < 3; pass++) {
+      for (let pass = 0; pass < 5; pass++) {
         ctx.beginPath();
         ctx.moveTo(lastPos.x + nx * o, lastPos.y + ny * o);
         ctx.lineTo(pos.x   + nx * o, pos.y   + ny * o);
@@ -569,28 +569,35 @@ function checkRevealPercent(canvas, ctx, cardIdx, cellIdx, state, cell) {
   const imageData = canvas.getContext('2d').getImageData(0, 0, cw, ch);
   const data = imageData.data;
 
-  // Sample a center-weighted grid instead of every pixel (cheaper + center-biased)
   const cx = cw / 2, cy = ch / 2;
   let totalWeight = 0, cleared = 0;
-  const step = 4; // sample every 4px
+  const step = 4;
   for (let y = 0; y < ch; y += step) {
     for (let x = 0; x < cw; x += step) {
       const dx = (x - cx) / cx, dy = (y - cy) / cy;
-      const dist = Math.sqrt(dx*dx + dy*dy); // 0 = center, ~1.4 = corner
-      const weight = Math.max(0.05, 1 - dist * 0.85); // center ~1.0, edges ~0.05
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const weight = Math.max(0.05, 1 - dist * 0.85);
       const idx = (y * cw + x) * 4 + 3;
       totalWeight += weight;
       if (data[idx] < 128) cleared += weight;
     }
   }
 
-  if (cleared / totalWeight > 0.45) {
+  const ratio = cleared / totalWeight;
+
+  // Lower threshold (~30%): mark as revealed — shows win border/glow
+  if (ratio > 0.30 && !cell.classList.contains('scratch-done')) {
     state.revealed.add(cellIdx);
-    canvas.parentElement.style.pointerEvents = 'none';
     cell.classList.add('scratch-done');
-    if (cell._removeScratchTouch) cell._removeScratchTouch();
     updateProgress(cardIdx, state);
     checkWin(cardIdx, state);
+  }
+
+  // Upper threshold (~65%): fully done — disable further scratching
+  if (ratio > 0.65) {
+    state.revealed.add(cellIdx);
+    canvas.parentElement.style.pointerEvents = 'none';
+    if (cell._removeScratchTouch) cell._removeScratchTouch();
   }
 }
 
