@@ -14,7 +14,7 @@
     --body-text: #67768e; --light-bg: #eef2f5; --board-bg: #dde4ea; --white: #ffffff;
   }
   body { font-family: 'Montserrat', sans-serif; background: var(--navy); }
-  .phone-frame { width: 100%; max-width: 480px; margin: 0 auto; background: var(--light-bg); display: flex; flex-direction: column; }
+  .phone-frame { width: 100%; max-width: 480px; margin: 0 auto; background: var(--light-bg); display: flex; flex-direction: column; min-height: 100vh; }
 
   .logo-img { height: 44px; width: auto; position: relative; z-index: 1; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -26,7 +26,7 @@
   .game-title { color: var(--white); font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 3px; letter-spacing: -0.5px; position: relative; z-index: 1; }
   .game-sub   { color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 500; letter-spacing: 0.3px; position: relative; z-index: 1; }
 
-  .wheel-area { background: var(--board-bg); padding: 32px 16px 32px; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; }
+  .wheel-area { background: var(--board-bg); padding: 32px 16px 32px; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0; flex-grow: 1; }
   .wheel-area::before { content: ''; position: absolute; top: -60px; right: -80px; width: 260px; height: 340px; background: rgba(0,95,126,0.10); transform: rotate(-18deg); pointer-events: none; }
 
   .wheel-wrap { position: relative; width: min(360px, 94vw); height: min(360px, 94vw); margin-bottom: 10px; }
