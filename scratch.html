@@ -318,6 +318,10 @@
 <div class="confetti-wrap" id="confetti-wrap"></div>
 
 <script>
+// ── Preload logo ──────────────────────────────────────────────────────────────
+const SMF_LOGO = new Image();
+SMF_LOGO.src = 'SMF-negativ-senca.png';
+
 // ── Prize definitions ─────────────────────────────────────────────────────────
 const PRIZES = [
   { id: 'jersey',  emoji: '👕', name: 'SMF dres',       desc: 'Uradni Sport Media Focus dres. Prevzemi na info pultu.',      code: 'SMF-DRES',   weight: 1 },
@@ -435,8 +439,12 @@ function buildCard(state, idx) {
 
     grid.appendChild(cell);
 
-    // Init canvas after layout
-    requestAnimationFrame(() => initScratch(cell, canvas, idx, cellIdx, state));
+    // Init canvas after layout, waiting for logo if needed
+    if (SMF_LOGO.complete) {
+      requestAnimationFrame(() => initScratch(cell, canvas, idx, cellIdx, state));
+    } else {
+      SMF_LOGO.addEventListener('load', () => requestAnimationFrame(() => initScratch(cell, canvas, idx, cellIdx, state)), { once: true });
+    }
   });
 
   return wrap;
@@ -449,8 +457,6 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width  = w * DPR;
   canvas.height = h * DPR;
-  canvas.style.width  = w + 'px';
-  canvas.style.height = h + 'px';
 
   const ctx = canvas.getContext('2d');
   const cw = canvas.width;
@@ -478,18 +484,16 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
     ctx.fill();
   }
 
-  // SMF logo watermark (drawn after dots so it's clean)
-  const logo = new Image();
-  logo.src = 'SMF-negativ-senca.png';
-  logo.onload = () => {
-    const maxW = cw * 0.55;
-    const scale = maxW / logo.width;
-    const lw = logo.width * scale;
-    const lh = logo.height * scale;
+  // SMF logo watermark — drawn synchronously before destination-out
+  if (SMF_LOGO.complete && SMF_LOGO.naturalWidth) {
+    const maxW = cw * 0.50;
+    const scale = maxW / SMF_LOGO.width;
+    const lw = SMF_LOGO.width * scale;
+    const lh = SMF_LOGO.height * scale;
     ctx.globalAlpha = 0.18;
-    ctx.drawImage(logo, (cw - lw) / 2, (ch - lh) / 2, lw, lh);
+    ctx.drawImage(SMF_LOGO, (cw - lw) / 2, (ch - lh) / 2, lw, lh);
     ctx.globalAlpha = 1;
-  };
+  }
 
   ctx.globalCompositeOperation = 'destination-out';
 
@@ -707,6 +711,24 @@ function launchConfetti() {
   }
   setTimeout(() => { wrap.innerHTML = ''; }, 3500);
 }
+
+// ── Resize handling ───────────────────────────────────────────────────────────
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    cards.forEach((state, cardIdx) => {
+      for (let i = 0; i < 9; i++) {
+        if (state.revealed.has(i)) continue;
+        const cell = document.getElementById(`cell-${cardIdx}-${i}`);
+        if (!cell) continue;
+        const canvas = cell.querySelector('canvas');
+        if (cell._removeScratchTouch) cell._removeScratchTouch();
+        initScratch(cell, canvas, cardIdx, i, state);
+      }
+    });
+  }, 150);
+});
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 newGame();
