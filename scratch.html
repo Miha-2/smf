@@ -532,9 +532,8 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
     const len = Math.sqrt(dx*dx + dy*dy) || 1;
     const nx = -dy / len, ny = dx / len;
 
+    const jitter = (Math.random() - 0.5) * r * 0.06;
     for (const { off, w } of LINES) {
-      // Add tiny random jitter per line so edges look rough
-      const jitter = (Math.random() - 0.5) * r * 0.06;
       const o = off + jitter;
       ctx.lineWidth = w;
       for (let pass = 0; pass < 3; pass++) {
