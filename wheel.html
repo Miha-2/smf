@@ -14,8 +14,8 @@
     --body-text: #67768e; --light-bg: #eef2f5; --board-bg: #dde4ea; --white: #ffffff;
   }
   html, body { height: 100%; }
-  body { font-family: 'Montserrat', sans-serif; background: var(--navy); }
-  .phone-frame { width: 100%; max-width: 480px; margin: 0 auto; background: var(--light-bg); display: flex; flex-direction: column; min-height: 100vh; }
+  body { font-family: 'Montserrat', sans-serif; background: var(--navy); overflow: hidden; }
+  .phone-frame { width: 100%; max-width: 480px; margin: 0 auto; background: var(--light-bg); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; overflow-x: hidden; }
 
   .logo-img { height: 44px; width: auto; position: relative; z-index: 1; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
