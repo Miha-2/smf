@@ -657,6 +657,8 @@ function checkWin(cardIdx, state) {
     const statusEl = document.getElementById(`status-${cardIdx}`);
     statusEl.textContent = 'Tokrat ni šlo. Poskusi znova!';
     statusEl.className = 'card-status status-lose';
+    const nowin = PRIZES.find(p => p.id === 'nowin');
+    setTimeout(() => showPrize(nowin, false), 600);
   }
 }
 
