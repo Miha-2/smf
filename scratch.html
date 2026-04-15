@@ -510,16 +510,18 @@ function initScratch(cell, canvas, cardIdx, cellIdx, state) {
     return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
   }
 
-  const r = Math.min(cw, ch) * 0.13;
+  const r = Math.min(cw, ch) * 0.20;
   ctx.lineCap = 'butt';
   ctx.lineJoin = 'round';
 
   // Coin-scratch brush: several thin parallel lines offset perpendicular to stroke direction
   // giving the look of a serrated coin edge dragged across the surface.
   const LINES = [
-    { off: -r * 0.70, w: r * 0.45 },
-    { off:  0,        w: r * 0.65 },
-    { off:  r * 0.68, w: r * 0.45 },
+    { off: -r * 0.80, w: r * 0.90 },
+    { off: -r * 0.42, w: r * 0.40 },
+    { off:  0,        w: r * 1.00 },
+    { off:  r * 0.44, w: r * 0.42 },
+    { off:  r * 0.78, w: r * 0.88 },
   ];
 
   let revealTick = 0;
